@@ -147,13 +147,13 @@ class AnnotationProvider
     /**
      * Get parameter transformers
      *
-     * @return array|null
+     * @return array
      * @throws RetrofitException
      */
     public function getParamTransformers()
     {
         if (!$this->annotations->exists(ParamTransformer::NAME)) {
-            return null;
+            return [];
         }
         $result = [];
         /** @var ParamTransformer[] $annotations */
