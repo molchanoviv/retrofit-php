@@ -20,6 +20,7 @@ use Tebru\Retrofit\Annotation\Headers;
 use Tebru\Retrofit\Annotation\HttpRequest;
 use Tebru\Retrofit\Annotation\JsonBody;
 use Tebru\Retrofit\Annotation\Multipart;
+use Tebru\Retrofit\Annotation\ParamTransformer;
 use Tebru\Retrofit\Annotation\Part;
 use Tebru\Retrofit\Annotation\Query;
 use Tebru\Retrofit\Annotation\QueryMap;
@@ -141,6 +142,39 @@ class AnnotationProvider
         $queryMapAnnotation = $this->annotations->get(QueryMap::NAME);
 
         return $queryMapAnnotation->getVariable();
+    }
+
+    /**
+     * Get parameter transformers
+     *
+     * @return array|null
+     * @throws RetrofitException
+     */
+    public function getParamTransformers()
+    {
+        if (!$this->annotations->exists(ParamTransformer::NAME)) {
+            return null;
+        }
+        $result = [];
+        /** @var ParamTransformer[] $annotations */
+        $annotations = $this->annotations->get(ParamTransformer::NAME);
+        foreach ($annotations as $annotation) {
+            $class = $annotation->getClass();
+            if (false === class_exists($class)) {
+                throw  new RetrofitException(sprintf('Class %s does not exists', $class));
+            }
+            if (!is_subclass_of($class, 'Tebru\Retrofit\Transformer\ParamTransformerInterface')) {
+                throw  new RetrofitException(
+                    sprintf(
+                        'Given param converter class %s should implement Tebru\Retrofit\Transformer\ParamTransformerInterface interface',
+                        $class
+                    )
+                );
+            }
+            $result[$annotation->getValue()] = $class;
+        }
+
+        return $result;
     }
 
     /**

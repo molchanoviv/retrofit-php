@@ -30,6 +30,7 @@ class UrlHandler implements Handler
         $queryMap = $context->annotations()->getQueryMap();
         $queries = $context->annotations()->getQueries();
         $uri = $context->annotations()->getRequestUri();
+        $paramTransformers = $context->annotations()->getParamTransformers();
 
         // if there aren't queries or a query map, just set request url
         if (null === $queryMap && null === $queries) {
@@ -43,22 +44,29 @@ class UrlHandler implements Handler
             // if we have regular queries, add them to the query builder
             if (null !== $queries) {
                 $queryArray = $context->printer()->printArray($queries);
-                $context->body()->add('$queryArray = \Tebru\Retrofit\Generation\Manipulator\QueryManipulator::boolToString(%s + %s);', $queryArray, $queryMap);
-                $context->body()->add('$queryString = http_build_query($queryArray);');
+                $context->body()->add('$queryArray = %s + %s;', $queryArray, $queryMap);
             } else {
-                $context->body()->add('$queryArray = \Tebru\Retrofit\Generation\Manipulator\QueryManipulator::boolToString(%s);', $queryMap);
-                $context->body()->add('$queryString = http_build_query($queryArray);');
+                $context->body()->add('$queryArray = %s;', $queryMap);
             }
-
-            $context->body()->add('$requestUrl = %s . "%s?" . $queryString;', $baseUrl, $uri);
-
-            return null;
+        } else {
+            // add queries to request url
+            $queryArray = $context->printer()->printArray($queries);
+            $context->body()->add('$queryArray = %s;', $queryArray);
         }
 
-        // add queries to request url
-        $queryArray = $context->printer()->printArray($queries);
-        $context->body()->add('$queryArray = \Tebru\Retrofit\Generation\Manipulator\QueryManipulator::boolToString(%s);', $queryArray);
+        foreach ($paramTransformers as $parameter => $transformer) {
+            $context->body()->add('if (isset($queryArray[\'%s\'])) {', $parameter);
+            $context->body()->add('$transformer = new %s();', $transformer);
+            $context->body()->add(
+                '$queryArray[\'%s\'] = $transformer->transform($queryArray[\'%s\']);',
+                $parameter,
+                $parameter
+            );
+            $context->body()->add('}');
+        }
+
+        $context->body()->add('$queryArray = \Tebru\Retrofit\Generation\Manipulator\QueryManipulator::boolToString($queryArray);');
         $context->body()->add('$queryString = http_build_query($queryArray);');
-        $context->body()->add('$requestUrl = %s . "%s" . "?" . $queryString;', $baseUrl, $uri);
+        $context->body()->add('$requestUrl = %s . "%s?" . $queryString;', $baseUrl, $uri);
     }
 }
