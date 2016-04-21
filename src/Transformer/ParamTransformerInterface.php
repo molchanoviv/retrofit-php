@@ -13,5 +13,10 @@ namespace Tebru\Retrofit\Transformer;
  */
 interface ParamTransformerInterface
 {
+    /**
+     * @param mixed $variable
+     *
+     * @return mixed
+     */
     public function transform($variable);
 }
