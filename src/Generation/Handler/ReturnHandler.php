@@ -29,6 +29,7 @@ class ReturnHandler implements Handler
     public function __invoke(HandlerContext $context)
     {
         $callback = $context->annotations()->getCallback();
+        $callback = null !== $callback ? $callback : $context->annotations()->getWrapperCallback();
 
         if ($callback !== null) {
             if ($context->annotations()->isCallbackOptional()) {

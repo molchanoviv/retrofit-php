@@ -31,7 +31,7 @@ class ResponseHandler implements Handler
         $callback = $context->annotations()->getCallback();
 
         if (null === $callback && $context->annotations()->hasHandlers()) {
-            $callback = '$lambdaWrapperCallback';
+            $callback = $context->annotations()->getWrapperCallback();
             $context->body()->add('%s = new Tebru\Retrofit\Http\LambdaWrapperCallback();', $callback);
             $context->body()->add('%s->setSuccessCallback(%s);', $callback, $context->annotations()->getSuccessCallback());
             $context->body()->add('%s->setErrorCallback(%s);', $callback, $context->annotations()->getErrorCallback());
