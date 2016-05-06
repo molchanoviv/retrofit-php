@@ -20,6 +20,8 @@ use Tebru\Retrofit\Annotation\Headers;
 use Tebru\Retrofit\Annotation\HttpRequest;
 use Tebru\Retrofit\Annotation\JsonBody;
 use Tebru\Retrofit\Annotation\Multipart;
+use Tebru\Retrofit\Annotation\OnSuccessCallback;
+use Tebru\Retrofit\Annotation\OnErrorCallback;
 use Tebru\Retrofit\Annotation\Part;
 use Tebru\Retrofit\Annotation\Query;
 use Tebru\Retrofit\Annotation\QueryMap;
@@ -483,6 +485,44 @@ class AnnotationProvider
         }
 
         return $callback->isOptional();
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSuccessCallback()
+    {
+        if (!$this->annotations->exists(OnSuccessCallback::NAME)) {
+            return null;
+        }
+
+        /** @var OnSuccessCallback $onSuccessCallbackAnnotation */
+        $onSuccessCallbackAnnotation = $this->annotations->get(OnSuccessCallback::NAME);
+
+        return $onSuccessCallbackAnnotation->getVariable();
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getErrorCallback()
+    {
+        if (!$this->annotations->exists(OnErrorCallback::NAME)) {
+            return null;
+        }
+
+        /** @var OnErrorCallback $onErrorCallbackAnnotation */
+        $onErrorCallbackAnnotation = $this->annotations->get(OnErrorCallback::NAME);
+
+        return $onErrorCallbackAnnotation->getVariable();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasHandlers()
+    {
+        return null !== $this->getSuccessCallback() || null !== $this->getErrorCallback();
     }
 
     /**
