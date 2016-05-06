@@ -555,6 +555,18 @@ class AnnotationProvider
     }
 
     /**
+     * @return string|null
+     */
+    public function getWrapperCallback()
+    {
+        if (false === $this->hasHandlers()) {
+            return null;
+        }
+
+        return '$lambdaWrapperCallback';
+    }
+
+    /**
      * @return boolean
      */
     public function hasHandlers()
