@@ -30,6 +30,13 @@ class ResponseHandler implements Handler
     {
         $callback = $context->annotations()->getCallback();
 
+        if (null === $callback && $context->annotations()->hasHandlers()) {
+            $callback = '$lambdaWrapperCallback';
+            $context->body()->add('%s = new Tebru\Retrofit\Http\LambdaWrapperCallback()', $callback);
+            $context->body()->add('%s->setSuccessCallback(%s)', $callback, $context->annotations()->getSuccessCallback());
+            $context->body()->add('%s->setErrorCallback(%s)', $callback, $context->annotations()->getErrorCallback());
+        }
+
         $context->body()->add('$request = new \GuzzleHttp\Psr7\Request("%s", $requestUrl, $headers, $body);', strtoupper($context->annotations()->getRequestMethod()));
         $context->body()->add('$beforeSendEvent = new \Tebru\Retrofit\Event\BeforeSendEvent($request);');
         $context->body()->add('$this->eventDispatcher->dispatch("retrofit.beforeSend", $beforeSendEvent);');
