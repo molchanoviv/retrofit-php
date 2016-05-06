@@ -515,6 +515,9 @@ class AnnotationProvider
         $callback = $this->getCallbackParameter();
 
         if (null === $callback) {
+            if ($this->hasHandlers()) {
+                return false;
+            }
             throw new LogicException('Callback does not exist');
         }
 
