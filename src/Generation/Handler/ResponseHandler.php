@@ -45,7 +45,11 @@ class ResponseHandler implements Handler
 
         if (null !== $callback) {
             if ($context->annotations()->isCallbackOptional()) {
-                $context->body()->add('if (%s !== null) {', $callback);
+                if (false === $context->annotations()->hasHandlers()) {
+                    $context->body()->add('if (%s !== null) {', $callback);
+                } else {
+                    $context->body()->add('if (%s !== null && %s->hasHandlers()) {', $callback, $callback);
+                }
                 $context->body()->add('$response = $this->client->sendAsync($request, %s);', $callback);
                 $context->body()->add('} else {');
                 $context->body()->add('$response = $this->client->send($request);');

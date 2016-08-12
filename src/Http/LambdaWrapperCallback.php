@@ -76,4 +76,12 @@ class LambdaWrapperCallback implements Callback
 
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function hasHandlers()
+    {
+        return $this->successCallback !== null || $this->errorCallback !== null;
+    }
 }
