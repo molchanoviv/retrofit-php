@@ -33,7 +33,11 @@ class ReturnHandler implements Handler
 
         if ($callback !== null) {
             if ($context->annotations()->isCallbackOptional()) {
-                $context->body()->add('if (%s !== null) {', $callback);
+                if (false === $context->annotations()->hasHandlers()) {
+                    $context->body()->add('if (%s !== null) {', $callback);
+                } else {
+                    $context->body()->add('if (%s !== null && %s->hasHandlers()) {', $callback, $callback);
+                }
                 $context->body()->add('$returnEvent = new \Tebru\Retrofit\Event\ReturnEvent(null);');
                 $context->body()->add('$this->eventDispatcher->dispatch("retrofit.return", $returnEvent);');
                 $context->body()->add('return $returnEvent->getReturn();');
