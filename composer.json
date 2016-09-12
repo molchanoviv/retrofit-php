@@ -7,7 +7,7 @@
         "phpoption/phpoption": "^1.1",
         "symfony/console": "^2.3|^3.0",
         "tebru/assert": "0.2",
-        "tebru/retrofit-http-clients": "^0.6.6",
+        "tebru/retrofit-http-clients": "v0.6.6",
         "symfony/event-dispatcher": "^2.3|^3.0",
         "guzzlehttp/psr7": "^1.0",
         "psr/log": "^1.0"
